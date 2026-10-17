@@ -123,12 +123,18 @@ const Standings = () => {
   // State for interactive sorting
   const [sortConfig, setSortConfig] = useState({ key: 'W', direction: 'desc' });
 
-  const standingsData = useMemo(() => {
-    // 1. Calculate base stats (W, L, PF, PA) using the standingsEngine logic
-    // This uses players.json as the source of truth for team mapping
-    const calculatedTeams = calculateStandings(gameFiles, playerConfig);
-    
-    // 2. Process calculated data for display (Win % and Point Differential)
+  // Build standings for one division. Team names like "Black (Lamoille)" exist in
+  // both divisions, so we hand the engine a players list limited to that division.
+  const buildDivision = (division) => {
+    const divisionConfig = {
+      ...playerConfig,
+      players: playerConfig.players.filter(p => p.division === division)
+    };
+    const calculatedTeams = calculateStandings(gameFiles, divisionConfig)
+      // If the engine tags rows with a division, keep only this one
+      .filter(t => !t.division || t.division === division);
+
+    // Process calculated data for display (Win % and Point Differential)
     let items = calculatedTeams.map(t => {
       const gp = t.W + t.L;
       return {
@@ -156,7 +162,10 @@ const Standings = () => {
     });
 
     return items;
-  }, [sortConfig]);
+  };
+
+  const boysStandings = useMemo(() => buildDivision('Boys'), [sortConfig]);
+  const girlsStandings = useMemo(() => buildDivision('Girls'), [sortConfig]);
 
   const requestSort = (key) => {
     let direction = 'desc';
@@ -169,8 +178,8 @@ const Standings = () => {
   return (
     <div className="container py-5" style={{ fontFamily: 'Inter, sans-serif' }}>
       <h1 className="text-center fw-black mb-5" style={{ letterSpacing: '-2px', fontSize: '3rem' }}>STANDINGS</h1>
-      {/* No conference split this season - single combined table */}
-      <ScrollableTeamsTable title="OVERALL" teams={standingsData} sortConfig={sortConfig} requestSort={requestSort} />
+      <ScrollableTeamsTable title="BOYS" teams={boysStandings} sortConfig={sortConfig} requestSort={requestSort} />
+      <ScrollableTeamsTable title="GIRLS" teams={girlsStandings} sortConfig={sortConfig} requestSort={requestSort} />
     </div>
   );
 };
