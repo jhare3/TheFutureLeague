@@ -26,9 +26,18 @@ const Stats = () => {
     return [statFilter, ...otherStats];
   }, [statFilter]);
 
-  const uniqueTeams = useMemo(() => {
-    const teams = (rosterData.players || []).map(p => p.team).filter(Boolean);
-    return [...new Set(teams)].sort();
+  const teamOptions = useMemo(() => {
+    const players = rosterData.players || [];
+    const map = new Map();
+    players.forEach(p => {
+      if (p.division && p.team) {
+        const div = p.division.trim();
+        const team = p.team.trim();
+        const label = `${div} - ${team}`;
+        map.set(label, { division: div, team: team, label });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
   }, []);
 
   const updateScrollState = () => {
@@ -103,12 +112,13 @@ const Stats = () => {
   const processedPlayers = useMemo(() => {
     return (rosterData.players || []).map(player => {
       const fullName = `${player.first_name} ${player.last_name}`.trim();
+      const matchName = (player.short_name || fullName).trim();
       
       const playerGames = allGameRows.filter(row => {
         const rawName = row['Player Name'];
         if (!rawName) return false;
         const cleanRowName = rawName.replace(/^#\d+\s*/, '').trim();
-        return cleanRowName.toUpperCase() === fullName.toUpperCase();
+        return cleanRowName.toUpperCase() === matchName.toUpperCase();
       });
       
       const calculatedStats = calculateSeasonStats(playerGames);
@@ -126,13 +136,25 @@ const Stats = () => {
     let items = [...processedPlayers];
 
     if (teamFilter) {
-      items = items.filter(p => p.team.toLowerCase() === teamFilter.toLowerCase());
+      if (teamFilter === 'Boys') {
+        items = items.filter(p => p.division && p.division.toLowerCase() === 'boys');
+      } else if (teamFilter === 'Girls') {
+        items = items.filter(p => p.division && p.division.toLowerCase() === 'girls');
+      } else if (teamFilter.includes(' - ')) {
+        const [div, team] = teamFilter.split(' - ');
+        items = items.filter(p => 
+          p.division && p.division.toLowerCase() === div.toLowerCase() && 
+          p.team && p.team.toLowerCase() === team.toLowerCase()
+        );
+      }
     }
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       items = items.filter(p => 
-        p.fullName.toLowerCase().includes(term) || p.team.toLowerCase().includes(term)
+        p.fullName.toLowerCase().includes(term) || 
+        (p.team && p.team.toLowerCase().includes(term)) || 
+        (p.division && p.division.toLowerCase().includes(term))
       );
     }
 
@@ -229,10 +251,19 @@ const Stats = () => {
             value={teamFilter}
             onChange={(e) => setTeamFilter(e.target.value)}
           >
-            <option value="">All Teams</option>
-            {uniqueTeams.map(team => (
-              <option key={team} value={team}>{team}</option>
-            ))}
+            <option value="">All Teams & Divisions</option>
+            <option value="Boys">Boys Division (All)</option>
+            <option value="Girls">Girls Division (All)</option>
+            <optgroup label="Boys Teams">
+              {teamOptions.filter(t => t.division.toLowerCase() === 'boys').map(t => (
+                <option key={t.label} value={t.label}>{t.label}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Girls Teams">
+              {teamOptions.filter(t => t.division.toLowerCase() === 'girls').map(t => (
+                <option key={t.label} value={t.label}>{t.label}</option>
+              ))}
+            </optgroup>
           </select>
 
           <input 
@@ -277,10 +308,12 @@ const Stats = () => {
             </thead>
             <tbody>
               {sortedPlayers.map(p => (
-                <tr key={p.fullName} style={rowStyle}>
+                <tr key={p.id} style={rowStyle}>
                   <td style={stickyNameCell}>
                     <div style={{ fontWeight: '700' }}>{p.fullName}</div>
-                    <div style={{ fontSize: '10px', color: '#ff4d4d', textTransform: 'uppercase' }}>{p.team}</div>
+                    <div style={{ fontSize: '10px', color: '#ff4d4d', textTransform: 'uppercase' }}>
+                      {p.division} — {p.team}
+                    </div>
                   </td>
                   {dynamicColumns.map(h => (
                     <td key={h} style={{ ...tdStyle, backgroundColor: statFilter === h ? '#fff5f5' : 'transparent' }}>
@@ -343,7 +376,7 @@ const edgeFadeBase = { position: 'absolute', top: 0, bottom: 0, width: '32px', p
 const edgeFadeLeft = { ...edgeFadeBase, left: 0, background: 'linear-gradient(to right, rgba(255,255,255,0.95), rgba(255,255,255,0))' };
 const edgeFadeRight = { ...edgeFadeBase, right: 0, width: '22px', background: 'linear-gradient(to left, rgba(255,255,255,0.65), rgba(255,255,255,0))' };
 const scrollHintArrow = { position: 'absolute', right: '6px', top: '50%', transform: 'translate(0, -50%)', zIndex: 9, pointerEvents: 'none', animation: 'statsScrollHintBounce 1.2s ease-in-out infinite' };
-const scrollHintDot = { display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#ff4d4d', color: '#fff', fontWeight: '700', fontSize: '15px', lineHeight: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.25)' };
+const scrollHintDot = { display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', borderRadius: '50%', backgroundColor: '#ff4d4d', color: '#fff', fontWeight: '700', fontSize: '15px', lineHeight: '1', boxShadow: '0 1px 4px rgba(0,0,0,0.25)' };
 const miniScrollTrack = { position: 'relative', width: '100%', height: '2.5px', backgroundColor: '#eee', borderRadius: '999px', marginBottom: '7px', overflow: 'hidden' };
 const miniScrollThumb = { position: 'absolute', top: 0, bottom: 0, left: 0, width: '100%', backgroundColor: '#ff4d4d', borderRadius: '999px', transition: 'left 0.05s linear' };
 

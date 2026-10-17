@@ -13,7 +13,6 @@ const navLinks = [
   { name: 'Schedule', path: '/schedule' },
   { name: 'Standings', path: '/standings' },
   { name: 'Stats', path: '/stats' },
-  { name: 'Recaps', path: '/recaps' },
 ];
 
   return (
@@ -143,8 +142,8 @@ const navLinks = [
         <nav className="navbar navbar-expand-lg custom-navbar">
           <div className="container-fluid p-0">
             <Link className="navbar-brand d-flex align-items-center" to="/">
-              <img src="/revolutionLogo.jpg" alt="Logo" className="custom-logo" />
-              <span>REVOLUTION 2026</span>
+              <img src="/TFL.jpeg" alt="Logo" className="custom-logo" />
+              <span>THE FUTURE LEAGUE 2026</span>
             </Link>
 
             <button

@@ -1,12 +1,31 @@
 {
   "Teams": [
-    "GREEN",
-    "RED",
-    "PINK",
-    "BLACK",
-    "GRAY",
-    "WHITE",
-    "BLUE",
-    "ORANGE"
+    "Black (Lamoille)",
+    "Blue (BHS 2)",
+    "Blue (BHS)",
+    "Gray (Winooski)",
+    "Green",
+    "Green (Mixed Township)",
+    "Light Blue (Fairfax)",
+    "Light Blue (SB)",
+    "Red (BHS 1)",
+    "Red (CVU)",
+    "White (Stowe)"
+  ],
+  "Boys": [
+    "Black (Lamoille)",
+    "Blue (BHS 2)",
+    "Gray (Winooski)",
+    "Green",
+    "Light Blue (Fairfax)",
+    "Red (BHS 1)",
+    "White (Stowe)"
+  ],
+  "Girls": [
+    "Black (Lamoille)",
+    "Blue (BHS)",
+    "Green (Mixed Township)",
+    "Light Blue (SB)",
+    "Red (CVU)"
   ]
 }

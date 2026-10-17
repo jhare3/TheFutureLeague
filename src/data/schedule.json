@@ -1,101 +1,212 @@
 [
   {
     "week": 1,
-    "date": "Sept. 20",
-    "location": "Tuttle Middle School, South Burlington",
+    "date": "October 11",
+    "location": "TBD",
     "games": [
-      { "time": "8:00 AM", "matchup": "Black vs White" },
-      { "time": "9:00 AM", "matchup": "Gray vs Orange" },
-      { "time": "10:00 AM", "matchup": "Green vs Pink" },
-      { "time": "11:00 AM", "matchup": "Blue vs Red" }
+      {
+        "time": "6:00 PM",
+        "matchup": "Red vs Green (Boys)"
+      },
+      {
+        "time": "6:00 PM",
+        "matchup": "Red vs Green (Girls)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "White vs Light Blue (Boys)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Black vs Light Blue (Girls)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Black vs Gray (Boys)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Blue vs Red (Girls)"
+      },
+      {
+        "time": "9:00 PM",
+        "matchup": "Blue vs Red (Boys)"
+      }
     ]
   },
   {
     "week": 2,
-    "date": "Sept. 27",
-    "location": "South Burlington High School",
+    "date": "October 18",
+    "location": "TBD",
     "games": [
-      { "time": "8:00 AM", "matchup": "Gray vs Pink" },
-      { "time": "9:00 AM", "matchup": "Black vs Red" },
-      { "time": "10:00 AM", "matchup": "Blue vs White" },
-      { "time": "11:00 AM", "matchup": "Green vs Orange" }
+      {
+        "time": "6:00 PM",
+        "matchup": "Blue vs White (Boys)"
+      },
+      {
+        "time": "6:00 PM",
+        "matchup": "Black vs Light Blue (Girls)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Green vs Gray (Boys)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Green vs Blue (Girls)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Black vs Light Blue (Boys)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Red vs Black (Girls)"
+      },
+      {
+        "time": "9:00 PM",
+        "matchup": "Red vs Blue (Boys)"
+      }
     ]
   },
   {
     "week": 3,
-    "date": "Oct. 4",
-    "location": "Edmunds Middle School",
+    "date": "October 23",
+    "location": "TBD",
     "games": [
-      { "time": "8:00 AM", "matchup": "Red vs White" },
-      { "time": "9:00 AM", "matchup": "Gray vs Green" },
-      { "time": "10:00 AM", "matchup": "Orange vs Pink" },
-      { "time": "11:00 AM", "matchup": "Black vs Blue" }
+      {
+        "time": "6:00 PM",
+        "matchup": "Green vs Black (Boys)"
+      },
+      {
+        "time": "6:00 PM",
+        "matchup": "Blue vs Black (Girls)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Red vs White (Boys)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Red vs Green (Girls)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Light Blue vs Gray (Boys)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Light Blue vs Blue (Girls)"
+      },
+      {
+        "time": "9:00 PM",
+        "matchup": "Blue vs Light Blue (Boys)"
+      }
     ]
   },
   {
     "week": 4,
-    "date": "Oct. 11",
-    "location": "Edmunds Middle School",
+    "date": "October 25",
+    "location": "TBD",
     "games": [
-      { "time": "8:00 AM", "matchup": "Blue vs Green" },
-      { "time": "9:00 AM", "matchup": "Orange vs White" },
-      { "time": "10:00 AM", "matchup": "Black vs Gray" },
-      { "time": "11:00 AM", "matchup": "Pink vs Red" }
+      {
+        "time": "6:00 PM",
+        "matchup": "Red vs Gray (Boys)"
+      },
+      {
+        "time": "6:00 PM",
+        "matchup": "Light Blue vs Green (Girls)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Green vs White (Boys)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Black vs Red (Girls)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Black vs Blue (Boys)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Blue vs Light Blue (Girls)"
+      },
+      {
+        "time": "9:00 PM",
+        "matchup": "Light Blue vs Black (Boys)"
+      }
     ]
   },
   {
     "week": 5,
-    "date": "Oct. 25",
+    "date": "November 6",
     "location": "TBD",
     "games": [
-      { "time": "8:00 AM", "matchup": "Green vs Red" },
-      { "time": "9:00 AM", "matchup": "Blue vs Pink" },
-      { "time": "10:00 AM", "matchup": "Gray vs White" },
-      { "time": "11:00 AM", "matchup": "Black vs Orange" }
+      {
+        "time": "6:00 PM",
+        "matchup": "Blue vs Gray (Boys)"
+      },
+      {
+        "time": "6:00 PM",
+        "matchup": "Red vs Blue (Girls)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Red vs Black (Boys)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Green vs Light Blue (Girls)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Green vs Light Blue (Boys)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Black vs Green (Girls)"
+      },
+      {
+        "time": "9:00 PM",
+        "matchup": "White vs Green (Boys)"
+      }
     ]
   },
   {
     "week": 6,
-    "date": "Nov. 8",
+    "date": "November 13",
     "location": "TBD",
     "games": [
-      { "time": "8:00 AM", "matchup": "Black vs Pink" },
-      { "time": "9:00 AM", "matchup": "Green vs White" },
-      { "time": "10:00 AM", "matchup": "Blue vs Orange" },
-      { "time": "11:00 AM", "matchup": "Gray vs Red" }
+      {
+        "time": "6:00 PM",
+        "matchup": "Red vs Light Blue (Boys)"
+      },
+      {
+        "time": "6:00 PM",
+        "matchup": "Green vs Black (Girls)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Blue vs Green (Boys)"
+      },
+      {
+        "time": "7:00 PM",
+        "matchup": "Light Blue vs Red (Girls)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "White vs Black (Boys)"
+      },
+      {
+        "time": "8:00 PM",
+        "matchup": "Blue vs Green (Girls)"
+      },
+      {
+        "time": "9:00 PM",
+        "matchup": "Gray vs White (Boys)"
+      }
     ]
-  },
-  {
-    "week": 7,
-    "date": "Nov. 15",
-    "location": "TBD",
-    "games": [
-      { "time": "8:00 AM", "matchup": "Blue vs Gray" },
-      { "time": "9:00 AM", "matchup": "Orange vs Red" },
-      { "time": "10:00 AM", "matchup": "Black vs Green" },
-      { "time": "11:00 AM", "matchup": "Pink vs White" }
-    ]
-  },
-  {
-    "week": "Playoffs",
-    "date": "TBD",
-    "location": "TBD",
-    "games": [
-      { "time": "TBD", "matchup": "TBD vs TBD" },
-      { "time": "TBD", "matchup": "TBD vs TBD" },
-      { "time": "TBD", "matchup": "TBD vs TBD" },
-      { "time": "TBD", "matchup": "TBD vs TBD" }
-    ],
-    "bye": null
-  },
-  {
-    "week": "Championships",
-    "date": "TBD",
-    "location": "TBD",
-    "games": [
-      { "time": "TBD", "matchup": "TBD vs TBD" },
-      { "time": "TBD", "matchup": "TBD vs TBD" }
-    ],
-    "bye": null
   }
 ]

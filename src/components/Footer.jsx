@@ -7,8 +7,8 @@ const Footer = () => {
       <Container>
         <Row className="gy-4 align-items-center">
           <Col xs={12} md={4} className="text-center text-md-start">
-            <h5 className="fw-black italic mb-1">REVOLUTION BASKETBALL</h5>
-            <p className="small text-muted mb-0">2026 Fall League | Hosted at Edmunds Middle School</p>
+            <h5 className="fw-black italic mb-1">THE FUTURE BASKETBALL LEAGUE 🏀</h5>
+            <p className="small text-muted mb-0">2026 Fall League</p>
           </Col>
           
           <Col xs={12} md={4} className="text-center">
@@ -24,8 +24,7 @@ const Footer = () => {
 
           <Col xs={12} md={4} className="text-center text-md-end">
             <div style={creditsStyle}>
-              <div>Organized by <span className="text-white">Andy Bousono</span></div>
-              <div>Recaps by <span className="text-white">Jimmy Warden</span></div>
+              <div>Organized by <span className="text-white">Revolution Basketball</span></div>  
               <div>Site Design by <span className="text-white">James Hare</span></div>
             </div>
           </Col>

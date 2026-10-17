@@ -16,8 +16,8 @@ const Home = () => {
         <div style={heroOverlay}>
 
           <div className="d-flex gap-3 justify-content-center mt-4">
-            <Button as={Link} to="/recaps" variant="danger" size="lg" className="fw-black shadow">
-              GAME RECAPS
+            <Button as={Link} to="/schedule" variant="danger" size="lg" className="fw-black shadow">
+              GAME SCHEDULE
             </Button>
             <Button as={Link} to="/stats" variant="outline-light" size="lg" className="fw-black shadow">
               LEAGUE STATS
@@ -57,7 +57,7 @@ const pageWrapper = {
 
 const heroSection = {
   height: '40vh', // Desktop height reverted
-  backgroundImage: 'url("/revolutionHero.png")',
+  backgroundImage: 'url("/TFL_cover.png")',
   backgroundSize: 'cover',
   backgroundPosition: 'top', // Orientation focused on the hoop
   position: 'relative',
