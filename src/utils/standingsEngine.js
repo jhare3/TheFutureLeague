@@ -1,70 +1,69 @@
 // src/utils/standingsEngine.js
 
+// Normalize a player name so small formatting differences don't break matching.
+const normName = (s) =>
+  String(s || '')
+    .replace(/^#\d+\s*/, '')   // strip leading "#12 "
+    .replace(/['’`]/g, '')     // O'Callaghan -> OCallaghan
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+
 export const calculateStandings = (gameFiles, rosterData) => {
   const teams = {};
 
-  // 1. Initialize all teams from the roster itself to ensure 0-0 teams appear.
-  const teamNames = [...new Set(rosterData.players.map(p => p.team.toUpperCase()))];
-
-  const setup = (name) => {
-    teams[name.toUpperCase()] = {
-      name: name,
-      W: 0, L: 0, PF: 0, PA: 0
-    };
-  };
-
-  teamNames.forEach(t => setup(t));
-
-  // Create a player-to-team lookup map from players.json
-  const playerToTeam = {};
-  rosterData.players.forEach(p => {
-    const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
-    playerToTeam[fullName] = p.team.toUpperCase();
+  // 1. Initialize every roster team so 0-0 teams still appear.
+  [...new Set(rosterData.players.map((p) => p.team))].forEach((name) => {
+    teams[name.toUpperCase()] = { name, W: 0, L: 0, PF: 0, PA: 0 };
   });
 
-  // 2. Process Game Files
+  // Player -> team lookup built from players.json
+  const playerToTeam = {};
+  rosterData.players.forEach((p) => {
+    playerToTeam[normName(`${p.first_name} ${p.last_name}`)] = p.team.toUpperCase();
+  });
+
+  // 2. Process each game
   Object.values(gameFiles).forEach((file) => {
-    const gameData = file.default || file;
-    if (!gameData.stats) return;
+    const game = file.default || file;
+    if (!game.stats || !game.scores) return;
 
-    const gameScores = {}; 
+    const { team1, team2 } = game.scores;
+    const labels = [team1, team2].map((t) => String(t.name).trim().toLowerCase());
 
-    // Aggregate points by looking up each player's team
-    gameData.stats.forEach(row => {
-      const rawName = row["Player Name"];
-      if (!rawName) return;
-
-      // Strip out leading numbers, hash signs, and extra spacing to match roster keys
-      const cleanName = rawName.replace(/^#\d+\s*/, '').trim().toLowerCase();
-      const teamName = playerToTeam[cleanName];
-      
-      if (teamName) {
-        if (!gameScores[teamName]) gameScores[teamName] = 0;
-        gameScores[teamName] += (parseInt(row.Points) || 0);
-      }
+    // Vote: which roster team does each side of this box score belong to?
+    // Votes come from roster-matched players, so unrostered/misspelled
+    // players are ignored instead of breaking the game.
+    const votes = { [labels[0]]: {}, [labels[1]]: {} };
+    game.stats.forEach((row) => {
+      const side = String(row.Team || '').trim().toLowerCase();
+      if (!votes[side]) return;
+      const team = playerToTeam[normName(row['Player Name'])];
+      if (team) votes[side][team] = (votes[side][team] || 0) + 1;
     });
 
-    const competing = Object.keys(gameScores);
-    
-    // Determine winner and loser based on aggregated player points
-    if (competing.length === 2) {
-      const [tA, tB] = competing;
-      const sA = gameScores[tA];
-      const sB = gameScores[tB];
+    const resolve = (label) => {
+      const entries = Object.entries(votes[label]);
+      if (!entries.length) return null;
+      return entries.sort((a, b) => b[1] - a[1])[0][0];
+    };
 
-      if (teams[tA] && teams[tB]) {
-        teams[tA].PF += sA; teams[tA].PA += sB;
-        teams[tB].PF += sB; teams[tB].PA += sA;
+    const tA = resolve(labels[0]);
+    const tB = resolve(labels[1]);
 
-        if (sA > sB) { 
-          teams[tA].W += 1; 
-          teams[tB].L += 1; 
-        } else if (sB > sA) { 
-          teams[tB].W += 1; 
-          teams[tA].L += 1; 
-        }
-      }
-    }
+    // Skip games that don't belong to this roster (e.g. the other division)
+    // or that couldn't be resolved to two different teams.
+    if (!tA || !tB || tA === tB || !teams[tA] || !teams[tB]) return;
+
+    // Use the official final scores, not summed player points.
+    const sA = Number(team1.final) || 0;
+    const sB = Number(team2.final) || 0;
+
+    teams[tA].PF += sA; teams[tA].PA += sB;
+    teams[tB].PF += sB; teams[tB].PA += sA;
+
+    if (sA > sB) { teams[tA].W += 1; teams[tB].L += 1; }
+    else if (sB > sA) { teams[tB].W += 1; teams[tA].L += 1; }
   });
 
   return Object.values(teams);
