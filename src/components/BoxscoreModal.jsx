@@ -1,11 +1,17 @@
 import React from 'react';
 import { Modal, Table, Row, Col, Badge } from 'react-bootstrap';
-import { groupStatsByTeam } from '../utils/boxscoreUtils';
 
 const BoxscoreModal = ({ show, onHide, gameData }) => {
   if (!gameData) return null;
 
-  const groupedStats = groupStatsByTeam(gameData.stats || []);
+  // Group players by the inline "Team" property provided by the new JSON
+  const groupedStats = (gameData.stats || []).reduce((acc, player) => {
+    const teamName = player.Team || 'Unknown Team';
+    if (!acc[teamName]) acc[teamName] = [];
+    acc[teamName].push(player);
+    return acc;
+  }, {});
+
   const t1 = gameData.scores?.team1 || {};
   const t2 = gameData.scores?.team2 || {};
   

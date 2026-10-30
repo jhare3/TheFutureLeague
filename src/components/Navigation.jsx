@@ -12,7 +12,6 @@ const navLinks = [
   { name: 'Rosters', path: '/rosters' },
   { name: 'Schedule', path: '/schedule' },
   { name: 'Standings', path: '/standings' },
-  { name: 'Stats', path: '/stats' },
 ];
 
   return (
