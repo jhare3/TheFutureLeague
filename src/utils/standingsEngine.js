@@ -1,70 +1,107 @@
 // src/utils/standingsEngine.js
+//
+// calculateStandings(gameFiles, divisionConfig)
+//   gameFiles       - result of import.meta.glob('../data/boxscores/**/*.json', { eager: true })
+//   divisionConfig  - players.json shape, with `players` already filtered to ONE division
+//
+// Returns: [{ name, division, W, L, PF, PA }]  (one row per team in that division)
 
-// Normalize a player name so small formatting differences don't break matching.
-const normName = (s) =>
-  String(s || '')
-    .replace(/^#\d+\s*/, '')   // strip leading "#12 "
-    .replace(/['’`]/g, '')     // O'Callaghan -> OCallaghan
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
+// Only boxscores inside these folders count toward standings.
+// Playoffs / championships are excluded on purpose. Add them here if you want them counted.
+const COUNTED_PATH = /\/boxscores\/week\d+\//i;
 
-export const calculateStandings = (gameFiles, rosterData) => {
-  const teams = {};
+// Boxscore team names -> roster team base names (boxscores say "Grey", roster says "Gray")
+const ALIASES = { grey: 'gray' };
 
-  // 1. Initialize every roster team so 0-0 teams still appear.
-  [...new Set(rosterData.players.map((p) => p.team))].forEach((name) => {
-    teams[name.toUpperCase()] = { name, W: 0, L: 0, PF: 0, PA: 0 };
-  });
+const norm = (s) => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
 
-  // Player -> team lookup built from players.json
-  const playerToTeam = {};
-  rosterData.players.forEach((p) => {
-    playerToTeam[normName(`${p.first_name} ${p.last_name}`)] = p.team.toUpperCase();
-  });
-
-  // 2. Process each game
-  Object.values(gameFiles).forEach((file) => {
-    const game = file.default || file;
-    if (!game.stats || !game.scores) return;
-
-    const { team1, team2 } = game.scores;
-    const labels = [team1, team2].map((t) => String(t.name).trim().toLowerCase());
-
-    // Vote: which roster team does each side of this box score belong to?
-    // Votes come from roster-matched players, so unrostered/misspelled
-    // players are ignored instead of breaking the game.
-    const votes = { [labels[0]]: {}, [labels[1]]: {} };
-    game.stats.forEach((row) => {
-      const side = String(row.Team || '').trim().toLowerCase();
-      if (!votes[side]) return;
-      const team = playerToTeam[normName(row['Player Name'])];
-      if (team) votes[side][team] = (votes[side][team] || 0) + 1;
-    });
-
-    const resolve = (label) => {
-      const entries = Object.entries(votes[label]);
-      if (!entries.length) return null;
-      return entries.sort((a, b) => b[1] - a[1])[0][0];
-    };
-
-    const tA = resolve(labels[0]);
-    const tB = resolve(labels[1]);
-
-    // Skip games that don't belong to this roster (e.g. the other division)
-    // or that couldn't be resolved to two different teams.
-    if (!tA || !tB || tA === tB || !teams[tA] || !teams[tB]) return;
-
-    // Use the official final scores, not summed player points.
-    const sA = Number(team1.final) || 0;
-    const sB = Number(team2.final) || 0;
-
-    teams[tA].PF += sA; teams[tA].PA += sB;
-    teams[tB].PF += sB; teams[tB].PA += sA;
-
-    if (sA > sB) { teams[tA].W += 1; teams[tB].L += 1; }
-    else if (sB > sA) { teams[tB].W += 1; teams[tA].L += 1; }
-  });
-
-  return Object.values(teams);
+// "Black (Lamoille)" -> "black",  "Light Blue (SB)" -> "light blue"
+const baseTeam = (s) => {
+  const b = norm(String(s || '').replace(/\(.*?\)/g, ''));
+  return ALIASES[b] || b;
 };
+
+// "#0 Owen Rock" -> ["owen", "rock"],  "#99 Sub Mac" -> ["mac"]
+const nameTokens = (playerName) =>
+  norm(String(playerName || '').replace(/^#\s*\d+\s*/, '').replace(/^sub\s+/i, ''))
+    .split(/[\s]+/)
+    .filter(Boolean);
+
+const toInt = (v) => {
+  const n = parseInt(String(v).replace(/[^\d-]/g, ''), 10);
+  return Number.isFinite(n) ? n : NaN;
+};
+
+const teamTotal = (t) => {
+  if (!t) return NaN;
+  const total = toInt(t.Total);
+  if (Number.isFinite(total)) return total;
+  const q = ['1', '2', '3', '4'].map((k) => toInt(t[k])).filter(Number.isFinite);
+  return q.length ? q.reduce((a, b) => a + b, 0) : NaN;
+};
+
+export function calculateStandings(gameFiles, playerConfig) {
+  const players = (playerConfig && playerConfig.players) || [];
+
+  // Seed every roster team so teams with no games still show up as 0-0
+  const table = new Map(); // baseName -> row
+  const rosterByTeam = new Map(); // baseName -> Set(last-name tokens)
+  players.forEach((p) => {
+    const key = baseTeam(p.team);
+    if (!table.has(key)) {
+      table.set(key, { name: p.team, division: p.division, W: 0, L: 0, PF: 0, PA: 0 });
+      rosterByTeam.set(key, new Set());
+    }
+    nameTokens(p.last_name).forEach((t) => rosterByTeam.get(key).add(t));
+  });
+
+  // Does this team's stat lines look like THIS division's roster for that team?
+  // (Team colors repeat across Boys/Girls, so we confirm by player names.)
+  const rosterMatchRatio = (stats, key) => {
+    const rows = (stats || []).filter((r) => baseTeam(r.Team) === key);
+    if (!rows.length) return 0;
+    const roster = rosterByTeam.get(key);
+    const hits = rows.filter((r) => nameTokens(r['Player Name']).some((t) => roster.has(t))).length;
+    return hits / rows.length;
+  };
+
+  const seen = new Set();
+
+  Object.entries(gameFiles || {}).forEach(([path, mod]) => {
+    if (!COUNTED_PATH.test(path.replace(/\\/g, '/'))) return;
+
+    // eager glob of JSON gives { ...json, default: json } -- use the clean object
+    const game = mod && mod.default ? mod.default : mod;
+    if (!game || !game.scores || !game.scores.team1 || !game.scores.team2) return;
+
+    const t1 = game.scores.team1;
+    const t2 = game.scores.team2;
+    const k1 = baseTeam(t1.name);
+    const k2 = baseTeam(t2.name);
+    if (!table.has(k1) || !table.has(k2)) return; // not a team in this division
+
+    const s1 = teamTotal(t1);
+    const s2 = teamTotal(t2);
+    if (!Number.isFinite(s1) || !Number.isFinite(s2)) return;
+
+    // Belong to this division? Both teams' player lines must match this division's rosters.
+    if (rosterMatchRatio(game.stats, k1) < 0.5 || rosterMatchRatio(game.stats, k2) < 0.5) return;
+
+    // Same game saved twice (e.g. copied into two folders) should only count once
+    const fingerprint = [game.date, k1, s1, k2, s2].join('|');
+    if (seen.has(fingerprint)) return;
+    seen.add(fingerprint);
+
+    const a = table.get(k1);
+    const b = table.get(k2);
+    a.PF += s1; a.PA += s2;
+    b.PF += s2; b.PA += s1;
+    if (s1 > s2) { a.W += 1; b.L += 1; }
+    else if (s2 > s1) { b.W += 1; a.L += 1; }
+    // exact tie: points count, no W/L
+  });
+
+  return Array.from(table.values());
+}
+
+export default calculateStandings;
